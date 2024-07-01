@@ -1,0 +1,371 @@
+package Controller;
+
+import Model.Produto;
+import Model.Venda;
+
+import java.util.ArrayList;
+
+public class Controlador {
+    private ArrayList<Produto> produtos;
+    private ArrayList<Venda> vendas;
+
+    public Controlador() {
+        this.produtos = new ArrayList<>();
+        this.vendas = new ArrayList<>();
+    }
+
+    public ArrayList<Produto> getProdutos() {
+        return produtos;
+    }
+
+    public void adicionarProduto(Produto produto) {
+        this.produtos.add(produto);
+    }
+
+    public ArrayList<Venda> getVendas() {
+        return vendas;
+    }
+
+    public void adicionarVenda(Venda venda) {
+        this.vendas.add(venda);
+    }
+}
+
+
+
+
+
+
+
+package Model;
+
+public class Produto {
+    private String nome;
+    private double preco;
+    private int quantidade;
+
+    public Produto(String nome, double preco, int quantidade) {
+        this.nome = nome;
+        this.preco = preco;
+        this.quantidade = quantidade;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public double getPreco() {
+        return preco;
+    }
+
+    public void setPreco(double preco) {
+        this.preco = preco;
+    }
+
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
+}
+
+
+
+
+
+
+
+package Model;
+
+public class ProdutoVendido extends Produto {
+    private int quantidadeVendida;
+
+    public ProdutoVendido(String nome, double preco, int quantidade, int quantidadeVendida) {
+        super(nome, preco, quantidade);
+        this.quantidadeVendida = quantidadeVendida;
+    }
+
+    public int getQuantidadeVendida() {
+        return quantidadeVendida;
+    }
+
+    public void setQuantidadeVendida(int quantidadeVendida) {
+        this.quantidadeVendida = quantidadeVendida;
+    }
+}
+
+
+
+
+
+
+
+
+package Model;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+public class Venda {
+    private ArrayList<ProdutoVendido> produtosVendidos;
+    private Date dataVenda;
+
+    public Venda() {
+        this.produtosVendidos = new ArrayList<>();
+        this.dataVenda = new Date();
+    }
+
+    public ArrayList<ProdutoVendido> getProdutosVendidos() {
+        return produtosVendidos;
+    }
+
+    public void adicionarProdutoVendido(ProdutoVendido produtoVendido) {
+        this.produtosVendidos.add(produtoVendido);
+    }
+
+    public Date getDataVenda() {
+        return dataVenda;
+    }
+
+    public void setDataVenda(Date dataVenda) {
+        this.dataVenda = dataVenda;
+    }
+}
+
+
+
+
+
+
+
+package View;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class LojaFrame extends JFrame {
+    public LojaFrame() {
+        setTitle("Loja");
+        setSize(300, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+
+        JButton produtosButton = new JButton("Produtos");
+        produtosButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new LojaProdutosFrame().setVisible(true);
+            }
+        });
+        add(produtosButton);
+
+        JButton vendasButton = new JButton("Vendas");
+        vendasButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new ListaVendasFrame().setVisible(true);
+            }
+        });
+        add(vendasButton);
+    }
+
+    public static void main(String[] args) {
+        new LojaFrame().setVisible(true);
+    }
+}
+
+
+
+
+
+
+
+package View;
+
+import Controller.Controlador;
+import Model.Produto;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class LojaProdutosFrame extends JFrame {
+    private Controlador controlador;
+
+    public LojaProdutosFrame() {
+        controlador = new Controlador();
+        setTitle("Produtos da Loja");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        DefaultListModel<Produto> listModel = new DefaultListModel<>();
+        JList<Produto> produtoList = new JList<>(listModel);
+        add(new JScrollPane(produtoList), BorderLayout.CENTER);
+
+        JPanel panel = new JPanel();
+        JButton addButton = new JButton("Adicionar Produto");
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ProdutoFrame produtoFrame = new ProdutoFrame(controlador, listModel);
+                produtoFrame.setVisible(true);
+            }
+        });
+        panel.add(addButton);
+        add(panel, BorderLayout.SOUTH);
+    }
+}
+
+
+
+
+
+
+
+package View;
+
+import Controller.Controlador;
+import Model.Produto;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class ProdutoFrame extends JFrame {
+    private Controlador controlador;
+    private DefaultListModel<Produto> listModel;
+
+    public ProdutoFrame(Controlador controlador, DefaultListModel<Produto> listModel) {
+        this.controlador = controlador;
+        this.listModel = listModel;
+
+        setTitle("Adicionar Produto");
+        setSize(300, 200);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new GridLayout(4, 2));
+
+        JLabel nomeLabel = new JLabel("Nome:");
+        JTextField nomeField = new JTextField();
+        JLabel precoLabel = new JLabel("Preço:");
+        JTextField precoField = new JTextField();
+        JLabel quantidadeLabel = new JLabel("Quantidade:");
+        JTextField quantidadeField = new JTextField();
+        JButton salvarButton = new JButton("Salvar");
+
+        salvarButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String nome = nomeField.getText();
+                double preco = Double.parseDouble(precoField.getText());
+                int quantidade = Integer.parseInt(quantidadeField.getText());
+
+                Produto produto = new Produto(nome, preco, quantidade);
+                controlador.adicionarProduto(produto);
+                listModel.addElement(produto);
+
+                dispose();
+            }
+        });
+
+        add(nomeLabel);
+        add(nomeField);
+        add(precoLabel);
+        add(precoField);
+        add(quantidadeLabel);
+        add(quantidadeField);
+        add(new JLabel());
+        add(salvarButton);
+    }
+}
+
+
+
+
+
+
+
+package View;
+
+import Controller.Controlador;
+import Model.ProdutoVendido;
+import Model.Venda;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class VendaFrame extends JFrame {
+    private Controlador controlador;
+
+    public VendaFrame(Controlador controlador) {
+        this.controlador = controlador;
+        setTitle("Registrar Venda");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        DefaultListModel<ProdutoVendido> listModel = new DefaultListModel<>();
+        JList<ProdutoVendido> vendaList = new JList<>(listModel);
+        add(new JScrollPane(vendaList), BorderLayout.CENTER);
+
+        JPanel panel = new JPanel();
+        JButton addButton = new JButton("Adicionar Produto Vendido");
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Lógica para adicionar produto vendido
+            }
+        });
+        panel.add(addButton);
+
+        JButton finalizarButton = new JButton("Finalizar Venda");
+        finalizarButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Venda venda = new Venda();
+                for (int i = 0; i < listModel.size(); i++) {
+                    venda.adicionarProdutoVendido(listModel.get(i));
+                }
+                controlador.adicionarVenda(venda);
+                dispose();
+            }
+        });
+        panel.add(finalizarButton);
+
+        add(panel, BorderLayout.SOUTH);
+    }
+}
+
+
+
+
+
+
+
+package View;
+
+import Controller.Controlador;
+import Model.Venda;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class ListaVendasFrame extends JFrame {
+    private Controlador controlador;
+
+    public ListaVendasFrame() {
+        controlador = new Controlador();
+        setTitle("Lista de Vendas");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        DefaultListModel<Venda> listModel = new DefaultListModel<>();
+        JList<Venda> vendaList = new JList<>(listModel);
+        add(new JScroll
